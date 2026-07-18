@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LedgerMind — Welcome</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="phone">
+
+  <!-- CAROUSEL: what a person sees before anything else -->
+  <div class="screen" id="carouselScreen">
+    <div class="carousel" id="carousel">
+
+      <div class="slide">
+        <div class="slide-icon">📒</div>
+        <h1>Everything you already use to run your business is here.</h1>
+        <p>Sales, stock, expenses, customers, debts — just like your notebook.</p>
+      </div>
+
+      <div class="slide">
+        <div class="slide-icon">💡</div>
+        <h1>But it doesn't just record. It understands.</h1>
+        <p class="example">"Rice usually sells out every Thursday. Your supplier is closed tomorrow — reorder today or you'll likely lose weekend sales."</p>
+      </div>
+
+      <div class="slide">
+        <div class="slide-icon">🔒</div>
+        <h1>Your money, your data — always yours to keep.</h1>
+        <p>Nothing is ever held back from you. Download everything, anytime, in one tap.</p>
+      </div>
+
+    </div>
+
+    <div class="dots" id="dots"></div>
+
+    <button class="btn-primary" id="carouselNextBtn">Continue</button>
+    <button class="btn-text" id="skipBtn">Skip</button>
+  </div>
+
+  <!-- SETUP STEP 1: business name -->
+  <div class="screen hidden" id="nameScreen">
+    <p class="eyebrow">Step 1 of 3</p>
+    <h1>What's your business called?</h1>
+    <p class="helper">This is the name you'll see every time you open LedgerMind.</p>
+    <input type="text" id="businessNameInput" placeholder="e.g. Adeyemi Provisions Store">
+    <button class="btn-primary" id="nameNextBtn" disabled>Continue</button>
+  </div>
+
+  <!-- SETUP STEP 2: business type -->
+  <div class="screen hidden" id="typeScreen">
+    <p class="eyebrow">Step 2 of 3</p>
+    <h1>What kind of business is this?</h1>
+    <p class="helper">Tap the one that fits best. If none fit exactly, choose "Other" and tell us.</p>
+
+    <div class="type-grid" id="typeGrid">
+      <button class="type-card" data-type="inventory_retail"><span>🛒</span>Shop / Store</button>
+      <button class="type-card" data-type="pharmacy"><span>💊</span>Pharmacy</button>
+      <button class="type-card" data-type="restaurant"><span>🍲</span>Restaurant</button>
+      <button class="type-card" data-type="hotel"><span>🏨</span>Hotel</button>
+      <button class="type-card" data-type="salon"><span>💇</span>Salon / Barber</button>
+      <button class="type-card" data-type="other"><span>✏️</span>Other</button>
+    </div>
+
+    <label id="otherTypeLabel" class="hidden">
+      Please tell us what kind of business
+      <input type="text" id="otherTypeInput" placeholder="e.g. Tailoring shop">
+    </label>
+
+    <button class="btn-primary" id="typeNextBtn" disabled>Continue</button>
+  </div>
+
+  <!-- SETUP STEP 3: photo onboarding offer -->
+  <div class="screen hidden" id="photoScreen">
+    <p class="eyebrow">Step 3 of 3</p>
+    <h1>Do you already keep records on paper?</h1>
+    <p class="helper">Snap a photo of your stock list or sales book and we'll set it up for you — no typing needed. You'll always see exactly what we read before anything is saved.</p>
+
+    <button class="btn-primary" id="uploadPhotoBtn">📷 Take or Upload a Photo</button>
+    <button class="btn-text" id="noPhotoBtn">I'll start fresh instead</button>
+  </div>
+
+  <!-- DONE -->
+  <div class="screen hidden" id="doneScreen">
+    <div class="slide-icon">✅</div>
+    <h1 id="doneHeadline">You're all set.</h1>
+    <p class="helper" id="doneHelper">Tap below to open <strong>My Book</strong> — that's your recording space, where every sale and debt lives from now on, just like your notebook.</p>
+    <button class="btn-primary" id="openBookBtn">Open My Book</button>
+  </div>
+
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
