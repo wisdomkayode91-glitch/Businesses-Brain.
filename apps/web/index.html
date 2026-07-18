@@ -1,131 +1,31 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LedgerMind</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
-</head>
-<body>
-
-<div class="phone">
-
-  <!-- SCREEN 1: CAROUSEL -->
-  <div class="screen" id="carouselScreen">
-    <div class="carousel-wrap">
-      <div class="carousel" id="carousel">
-        <div class="slide">
-          <div class="slide-icon">📒</div>
-          <h1>Everything you already use to run your business is here.</h1>
-          <p>Sales, stock, expenses, customers, debts — just like your notebook.</p>
-        </div>
-        <div class="slide">
-          <div class="slide-icon">💡</div>
-          <h1>But it doesn't just record. It understands.</h1>
-          <p class="example">"Rice usually sells out every Thursday. Your supplier is closed tomorrow — reorder today or you'll likely lose weekend sales."</p>
-        </div>
-        <div class="slide">
-          <div class="slide-icon">🔒</div>
-          <h1>Your money, your data — always yours to keep.</h1>
-          <p>Nothing is ever held back from you. Download everything, anytime, in one tap.</p>
-        </div>
+<!-- SCREEN 1: CAROUSEL -->
+<div class="screen" id="carouselScreen">
+  <div class="carousel-wrap">
+    <div class="carousel" id="carousel">
+      <div class="slide">
+        <div class="slide-icon">📒</div>
+        <h1>Everything you already use to run your business is here.</h1>
+        <p>Sales, stock, expenses, customers, debts — just like your notebook.</p>
       </div>
-      <button class="arrow-btn" id="arrowBtn" aria-label="Next">→</button>
+      <div class="slide">
+        <div class="slide-icon">💡</div>
+        <h1>But it doesn't just record. It understands.</h1>
+        <p class="example">"Rice usually sells out every Thursday. Your supplier is closed tomorrow — reorder today or you'll likely lose weekend sales."</p>
+      </div>
+      <div class="slide">
+        <div class="slide-icon">🔒</div>
+        <h1>Your money, your data — always yours to keep.</h1>
+        <p>Nothing is ever held back from you. Download everything, anytime, in one tap.</p>
+      </div>
     </div>
-
-    <div class="dots" id="dots"></div>
-    <button class="btn-primary" id="getStartedBtn">Get Started</button>
   </div>
 
-  <!-- SCREEN 2: BUSINESS NAME -->
-  <div class="screen hidden" id="nameScreen">
-    <p class="eyebrow">Step 1 of 3</p>
-    <h1>What's your business called?</h1>
-    <p class="helper">This is the name you'll see every time you open LedgerMind.</p>
-    <input type="text" id="businessNameInput" placeholder="e.g. Adeyemi Provisions Store">
-    <button class="btn-primary" id="nameNextBtn" disabled>Continue</button>
+  <div class="dots" id="dots"></div>
+  
+  <div class="carousel-nav">
+    <button class="arrow-btn" id="prevBtn" aria-label="Previous">←</button>
+    <button class="arrow-btn" id="nextBtn" aria-label="Next">→</button>
   </div>
-
-  <!-- SCREEN 3: BUSINESS TYPE -->
-  <div class="screen hidden" id="typeScreen">
-    <p class="eyebrow">Step 2 of 3</p>
-    <h1>What kind of business is this?</h1>
-    <p class="helper">Tap the one that fits best. If none fit exactly, choose "Other" and tell us.</p>
-    <div class="type-grid" id="typeGrid">
-      <button class="type-card" data-type="inventory_retail"><span>🛒</span>Shop / Store</button>
-      <button class="type-card" data-type="pharmacy"><span>💊</span>Pharmacy</button>
-      <button class="type-card" data-type="restaurant"><span>🍲</span>Restaurant</button>
-      <button class="type-card" data-type="hotel"><span>🏨</span>Hotel</button>
-      <button class="type-card" data-type="salon"><span>💇</span>Salon / Barber</button>
-      <button class="type-card" data-type="other"><span>✏️</span>Other</button>
-    </div>
-    <label id="otherTypeLabel" class="hidden">
-      Please tell us what kind of business
-      <input type="text" id="otherTypeInput" placeholder="e.g. Tailoring shop">
-    </label>
-    <button class="btn-primary" id="typeNextBtn" disabled>Continue</button>
-  </div>
-
-  <!-- SCREEN 4: PHOTO ONBOARDING -->
-  <div class="screen hidden" id="photoScreen">
-    <p class="eyebrow">Step 3 of 3</p>
-    <h1>Do you already keep records on paper?</h1>
-    <p class="helper">Snap a photo of your stock list or sales book and we'll set it up for you — no typing needed. You'll always see exactly what we read before anything is saved.</p>
-    <button class="btn-primary" id="uploadPhotoBtn">📷 Take or Upload a Photo</button>
-    <button class="btn-text" id="noPhotoBtn">I'll start fresh instead</button>
-  </div>
-
-  <!-- SCREEN 5: MY BOOK (the real recorder — same page, same URL) -->
-  <div class="screen hidden" id="bookScreen">
-    <header>
-      <p class="eyebrow" id="bookEyebrow">My Book — New Entry</p>
-      <h1>Record a Sale</h1>
-      <p class="helper">This is your recording space, just like your notebook.</p>
-    </header>
-
-    <form id="saleForm">
-      <label>
-        What did you sell?
-        <input type="text" id="itemName" placeholder="e.g. Rice (50kg bag)" required>
-      </label>
-      <div class="row">
-        <label>
-          How many?
-          <input type="number" id="quantity" value="1" min="1" required>
-        </label>
-        <label>
-          Price per one (₦)
-          <input type="number" id="unitPrice" placeholder="e.g. 2000" min="0" required>
-        </label>
-      </div>
-      <label>
-        How did the customer pay?
-        <select id="paymentMethod">
-          <option value="cash">Cash</option>
-          <option value="pos">POS / Card</option>
-          <option value="transfer">Bank Transfer</option>
-          <option value="credit">Not yet — they'll pay later</option>
-        </select>
-      </label>
-      <label id="customerField" class="hidden">
-        Who owes you this money?
-        <input type="text" id="customerName" placeholder="e.g. Chief Bola">
-      </label>
-      <div class="total-preview">
-        <span>Total for this sale</span>
-        <span id="totalDisplay">₦0</span>
-      </div>
-      <button type="submit" id="submitBtn">Save to My Book</button>
-      <p id="statusMessage"></p>
-    </form>
-  </div>
-
+  
+  <button class="btn-primary" id="getStartedBtn">Get Started</button>
 </div>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="supabaseClient.js"></script>
-<script src="app.js"></script>
-</body>
-</html>
