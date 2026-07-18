@@ -12,35 +12,48 @@
 
 <div class="phone">
 
+  <!-- LOGO HEADER — appears on every screen -->
+  <div class="brand-header">
+    <img src="assets/logo.png" alt="LedgerMind" class="brand-logo">
+    <p class="brand-tagline">The business that understands itself</p>
+  </div>
+
   <!-- SCREEN 1: CAROUSEL -->
   <div class="screen" id="carouselScreen">
-    <div class="carousel-wrap">
+    <div class="carousel-wrap" id="carouselWrap">
       <div class="carousel" id="carousel">
+
         <div class="slide">
           <div class="slide-icon">📒</div>
           <h1>Everything you already use to run your business is here.</h1>
           <p>Sales, stock, expenses, customers, debts — just like your notebook.</p>
+          <p class="works-for-line">Built for every kind of business — pharmacies, hotels, restaurants, mechanic workshops, salons, schools, and more.</p>
         </div>
+
         <div class="slide">
           <div class="slide-icon">💡</div>
           <h1>But it doesn't just record. It understands.</h1>
-          <p class="example">"Rice usually sells out every Thursday. Your supplier is closed tomorrow — reorder today or you'll likely lose weekend sales."</p>
+          <div class="example">This batch of paracetamol expires in two days — move it to the front of the shelf so it sells before it's wasted.</div>
+          <div class="example">Rice usually sells out every Thursday. Your supplier is closed tomorrow — reorder today or you'll likely lose weekend sales.</div>
+          <div class="example">Room 204 already has a booking for Friday night — confirm before accepting another guest for the same date.</div>
         </div>
+
         <div class="slide">
           <div class="slide-icon">🔒</div>
           <h1>Your money, your data — always yours to keep.</h1>
           <p>Nothing is ever held back from you. Download everything, anytime, in one tap.</p>
         </div>
+
       </div>
     </div>
 
     <div class="dots" id="dots"></div>
-    
+
     <div class="carousel-nav">
       <button class="arrow-btn" id="prevBtn" aria-label="Previous">←</button>
-      <button class="arrow-btn" id="nextBtn" aria-label="Next">→</button>
+      <button class="arrow-btn active" id="nextBtn" aria-label="Next">→</button>
     </div>
-    
+
     <button class="btn-primary" id="getStartedBtn">Get Started</button>
   </div>
 
@@ -56,14 +69,16 @@
   <!-- SCREEN 3: BUSINESS TYPE -->
   <div class="screen hidden" id="typeScreen">
     <p class="eyebrow">Step 2 of 3</p>
-    <h1>What kind of business is this?</h1>
-    <p class="helper">Tap the one that fits best. If none fit exactly, choose "Other" and tell us.</p>
+    <h1>Which of these best describes your business?</h1>
+    <p class="helper">Please choose the closest match. If nothing quite fits, select "Other" and tell us a little more.</p>
     <div class="type-grid" id="typeGrid">
       <button class="type-card" data-type="inventory_retail"><span>🛒</span>Shop / Store</button>
       <button class="type-card" data-type="pharmacy"><span>💊</span>Pharmacy</button>
       <button class="type-card" data-type="restaurant"><span>🍲</span>Restaurant</button>
       <button class="type-card" data-type="hotel"><span>🏨</span>Hotel</button>
       <button class="type-card" data-type="salon"><span>💇</span>Salon / Barber</button>
+      <button class="type-card" data-type="mechanic"><span>🔧</span>Mechanic Workshop</button>
+      <button class="type-card" data-type="school"><span>🎓</span>School / Training Centre</button>
       <button class="type-card" data-type="other"><span>✏️</span>Other</button>
     </div>
     <label id="otherTypeLabel" class="hidden">
@@ -122,7 +137,7 @@
         <span>Total for this sale</span>
         <span id="totalDisplay">₦0</span>
       </div>
-      <button type="submit" id="submitBtn" class="btn-primary">Save to My Book</button>
+      <button type="submit" id="submitBtn">Save to My Book</button>
       <p id="statusMessage"></p>
     </form>
   </div>
@@ -133,4 +148,4 @@
 <script src="supabaseClient.js"></script>
 <script src="app.js"></script>
 </body>
-        </html>
+  </html>
