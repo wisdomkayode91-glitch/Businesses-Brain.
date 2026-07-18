@@ -1,24 +1,24 @@
 // TEMPORARY until real login is built.
 const TEST_BUSINESS_ID = "PASTE_A_TEST_BUSINESS_UUID_HERE";
 
-// ── Screen switching ─────────────────────────────────────
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
   document.getElementById(id).classList.remove('hidden');
 }
 
-// ── Carousel: auto-advances every 6s, pauses on hover/touch ──
+// ── Carousel: 6s auto-advance, pause on hover/touch, dual arrows ──
 const slides = document.querySelectorAll('.slide');
 const dotsContainer = document.getElementById('dots');
+const carouselWrap = document.getElementById('carouselWrap');
 const prevBtn = document.getElementById('prevBtn');
 const nextBtn = document.getElementById('nextBtn');
-const carouselWrap = document.querySelector('.carousel-wrap');
+
 let currentSlide = 0;
 let autoTimer;
 let isPaused = false;
 
 slides.forEach((s, i) => {
-  s.style.display = i === 0 ? 'block' : 'none';
+  s.classList.toggle('active', i === 0);
   const dot = document.createElement('div');
   dot.className = 'dot' + (i === 0 ? ' active' : '');
   dotsContainer.appendChild(dot);
@@ -26,57 +26,31 @@ slides.forEach((s, i) => {
 const dots = document.querySelectorAll('.dot');
 
 function goToSlide(index) {
-  currentSlide = ((index % slides.length) + slides.length) % slides.length;
-  slides.forEach((s, i) => s.style.display = i === currentSlide ? 'block' : 'none');
+  currentSlide = (index + slides.length) % slides.length;
+  slides.forEach((s, i) => s.classList.toggle('active', i === currentSlide));
   dots.forEach((d, i) => d.classList.toggle('active', i === currentSlide));
 }
 
 function startAutoAdvance() {
-  if (autoTimer) clearInterval(autoTimer);
-  if (!isPaused) {
-    autoTimer = setInterval(() => goToSlide(currentSlide + 1), 6000);
-  }
+  autoTimer = setInterval(() => {
+    if (!isPaused) goToSlide(currentSlide + 1);
+  }, 6000);
 }
 function resetAutoAdvance() {
   clearInterval(autoTimer);
   startAutoAdvance();
 }
 
-// ── Pause on hover (desktop) ──
-carouselWrap.addEventListener('mouseenter', () => {
-  isPaused = true;
-  clearInterval(autoTimer);
-});
-carouselWrap.addEventListener('mouseleave', () => {
-  isPaused = false;
-  startAutoAdvance();
-});
-
-// ── Pause on touch (mobile) ──
-carouselWrap.addEventListener('touchstart', () => {
-  isPaused = true;
-  clearInterval(autoTimer);
-});
-carouselWrap.addEventListener('touchend', () => {
-  isPaused = false;
-  startAutoAdvance();
-});
-carouselWrap.addEventListener('touchcancel', () => {
-  isPaused = false;
-  startAutoAdvance();
-});
-
-// Arrow buttons
-prevBtn.addEventListener('click', () => {
-  goToSlide(currentSlide - 1);
-  resetAutoAdvance();
-});
-nextBtn.addEventListener('click', () => {
-  goToSlide(currentSlide + 1);
-  resetAutoAdvance();
-});
-
 startAutoAdvance();
+
+carouselWrap.addEventListener('mouseenter', () => isPaused = true);
+carouselWrap.addEventListener('mouseleave', () => isPaused = false);
+carouselWrap.addEventListener('touchstart', () => isPaused = true);
+carouselWrap.addEventListener('touchend', () => isPaused = false);
+carouselWrap.addEventListener('touchcancel', () => isPaused = false);
+
+nextBtn.addEventListener('click', () => { goToSlide(currentSlide + 1); resetAutoAdvance(); });
+prevBtn.addEventListener('click', () => { goToSlide(currentSlide - 1); resetAutoAdvance(); });
 
 document.getElementById('getStartedBtn').addEventListener('click', () => {
   clearInterval(autoTimer);
@@ -118,7 +92,7 @@ otherTypeInput.addEventListener('input', () => {
 });
 typeNextBtn.addEventListener('click', () => showScreen('photoScreen'));
 
-// ── Step 3: photo onboarding → straight into My Book, same page ──
+// ── Step 3: photo onboarding → My Book ───────────────────
 document.getElementById('uploadPhotoBtn').addEventListener('click', () => {
   alert('This opens your camera or photo library in the real build.');
   enterMyBook();
@@ -126,6 +100,9 @@ document.getElementById('uploadPhotoBtn').addEventListener('click', () => {
 document.getElementById('noPhotoBtn').addEventListener('click', enterMyBook);
 
 function enterMyBook() {
+  // TODO: insert into `businesses` here with name = businessName,
+  // archetype_type = selectedType (or otherTypeInput.value), then use
+  // the returned id instead of TEST_BUSINESS_ID going forward.
   showScreen('bookScreen');
 }
 
