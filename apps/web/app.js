@@ -7,12 +7,15 @@ function showScreen(id) {
   document.getElementById(id).classList.remove('hidden');
 }
 
-// ── Carousel: auto-advances every 5s, plus manual arrow ──
+// ── Carousel: auto-advances every 6s, pauses on hover, arrows at bottom ──
 const slides = document.querySelectorAll('.slide');
 const dotsContainer = document.getElementById('dots');
-const arrowBtn = document.getElementById('arrowBtn');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+const carouselWrap = document.querySelector('.carousel-wrap');
 let currentSlide = 0;
 let autoTimer;
+let isPaused = false;
 
 slides.forEach((s, i) => {
   s.style.display = i === 0 ? 'block' : 'none';
@@ -23,20 +26,38 @@ slides.forEach((s, i) => {
 const dots = document.querySelectorAll('.dot');
 
 function goToSlide(index) {
-  currentSlide = index % slides.length;
+  currentSlide = ((index % slides.length) + slides.length) % slides.length;
   slides.forEach((s, i) => s.style.display = i === currentSlide ? 'block' : 'none');
   dots.forEach((d, i) => d.classList.toggle('active', i === currentSlide));
 }
 
 function startAutoAdvance() {
-  autoTimer = setInterval(() => goToSlide(currentSlide + 1), 5000);
+  if (autoTimer) clearInterval(autoTimer);
+  if (!isPaused) {
+    autoTimer = setInterval(() => goToSlide(currentSlide + 1), 6000);
+  }
 }
 function resetAutoAdvance() {
   clearInterval(autoTimer);
   startAutoAdvance();
 }
 
-arrowBtn.addEventListener('click', () => {
+// Pause on hover
+carouselWrap.addEventListener('mouseenter', () => {
+  isPaused = true;
+  clearInterval(autoTimer);
+});
+carouselWrap.addEventListener('mouseleave', () => {
+  isPaused = false;
+  startAutoAdvance();
+});
+
+// Arrow buttons
+prevBtn.addEventListener('click', () => {
+  goToSlide(currentSlide - 1);
+  resetAutoAdvance();
+});
+nextBtn.addEventListener('click', () => {
   goToSlide(currentSlide + 1);
   resetAutoAdvance();
 });
