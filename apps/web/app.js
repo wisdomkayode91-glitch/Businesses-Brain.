@@ -7,7 +7,7 @@ function showScreen(id) {
   document.getElementById(id).classList.remove('hidden');
 }
 
-// ── Carousel: auto-advances every 6s, pauses on hover, arrows at bottom ──
+// ── Carousel: auto-advances every 6s, pauses on hover/touch ──
 const slides = document.querySelectorAll('.slide');
 const dotsContainer = document.getElementById('dots');
 const prevBtn = document.getElementById('prevBtn');
@@ -42,12 +42,26 @@ function resetAutoAdvance() {
   startAutoAdvance();
 }
 
-// Pause on hover
+// ── Pause on hover (desktop) ──
 carouselWrap.addEventListener('mouseenter', () => {
   isPaused = true;
   clearInterval(autoTimer);
 });
 carouselWrap.addEventListener('mouseleave', () => {
+  isPaused = false;
+  startAutoAdvance();
+});
+
+// ── Pause on touch (mobile) ──
+carouselWrap.addEventListener('touchstart', () => {
+  isPaused = true;
+  clearInterval(autoTimer);
+});
+carouselWrap.addEventListener('touchend', () => {
+  isPaused = false;
+  startAutoAdvance();
+});
+carouselWrap.addEventListener('touchcancel', () => {
   isPaused = false;
   startAutoAdvance();
 });
