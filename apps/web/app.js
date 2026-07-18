@@ -7,7 +7,7 @@ function showScreen(id) {
   document.getElementById(id).classList.remove('hidden');
 }
 
-// ── Carousel: auto-advances every 3s, plus manual arrow ──
+// ── Carousel: auto-advances every 5s, plus manual arrow ──
 const slides = document.querySelectorAll('.slide');
 const dotsContainer = document.getElementById('dots');
 const arrowBtn = document.getElementById('arrowBtn');
@@ -29,7 +29,7 @@ function goToSlide(index) {
 }
 
 function startAutoAdvance() {
-  autoTimer = setInterval(() => goToSlide(currentSlide + 1), 3000);
+  autoTimer = setInterval(() => goToSlide(currentSlide + 1), 5000);
 }
 function resetAutoAdvance() {
   clearInterval(autoTimer);
