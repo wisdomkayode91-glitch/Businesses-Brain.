@@ -105,6 +105,21 @@
     <button class="btn-text" id="noPhotoBtn" type="button">I'll start fresh instead</button>
   </div>
 
+  <!-- NEW: My Book list view — the diary, shown first when entering My Book -->
+  <div class="screen hidden" id="bookListScreen">
+    <header>
+      <p class="eyebrow">My Book</p>
+      <h1 id="bookListHeadline">Your Sales &amp; Debts</h1>
+      <p class="helper">Everything you've recorded, newest first.</p>
+    </header>
+
+    <div id="bookList" class="book-list">
+      <p class="empty-state" id="emptyState">Nothing recorded yet. Tap below to add your first sale.</p>
+    </div>
+
+    <button class="btn-primary" id="goToRecordBtn" type="button">+ Record a Sale</button>
+  </div>
+
   <div class="screen hidden" id="bookScreen">
     <header>
       <p class="eyebrow" id="bookEyebrow">My Book — New Entry</p>
@@ -147,6 +162,8 @@
       <button type="submit" id="submitBtn" class="btn-primary">Save to My Book</button>
       <p id="statusMessage"></p>
     </form>
+
+    <button class="btn-text" id="backToListBtn" type="button">← Back to My Book</button>
   </div>
 
 </div>
