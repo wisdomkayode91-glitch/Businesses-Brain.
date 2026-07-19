@@ -33,14 +33,12 @@
   <div class="screen" id="carouselScreen">
     <div class="carousel-wrap" id="carouselWrap">
       <div class="carousel" id="carousel">
-
         <div class="slide">
           <div class="slide-icon">📒</div>
           <h1>Everything you already use to run your business is here.</h1>
           <p>Sales, stock, expenses, customers, debts — just like your notebook.</p>
           <p class="works-for-line">Built for every kind of business — pharmacies, hotels, restaurants, mechanic workshops, salons, schools, and more.</p>
         </div>
-
         <div class="slide">
           <div class="slide-icon">💡</div>
           <h1>But it doesn't just record. It understands.</h1>
@@ -48,23 +46,18 @@
           <div class="example">Rice usually sells out every Thursday. Your supplier is closed tomorrow — reorder today or you'll likely lose weekend sales.</div>
           <div class="example">Room 204 already has a booking for Friday night — confirm before accepting another guest for the same date.</div>
         </div>
-
         <div class="slide">
           <div class="slide-icon">🔒</div>
           <h1>Your money, your data — always yours to keep.</h1>
           <p>Nothing is ever held back from you. Download everything, anytime, in one tap.</p>
         </div>
-
       </div>
     </div>
-
     <div class="dots" id="dots"></div>
-
     <div class="carousel-nav">
       <button class="arrow-btn" id="prevBtn" type="button" aria-label="Previous">←</button>
       <button class="arrow-btn active" id="nextBtn" type="button" aria-label="Next">→</button>
     </div>
-
     <button class="btn-primary" id="getStartedBtn" type="button">Get Started</button>
   </div>
 
@@ -105,19 +98,22 @@
     <button class="btn-text" id="noPhotoBtn" type="button">I'll start fresh instead</button>
   </div>
 
-  <!-- NEW: My Book list view — the diary, shown first when entering My Book -->
+  <!-- MY BOOK LIST — now with tap-to-manage on each row -->
   <div class="screen hidden" id="bookListScreen">
     <header>
       <p class="eyebrow">My Book</p>
-      <h1 id="bookListHeadline">Your Sales &amp; Debts</h1>
-      <p class="helper">Everything you've recorded, newest first.</p>
+      <h1>Your Sales &amp; Debts</h1>
+      <p class="helper">Tap any entry to mark it paid or delete it.</p>
     </header>
 
     <div id="bookList" class="book-list">
       <p class="empty-state" id="emptyState">Nothing recorded yet. Tap below to add your first sale.</p>
     </div>
 
-    <button class="btn-primary" id="goToRecordBtn" type="button">+ Record a Sale</button>
+    <div class="two-btn-row">
+      <button class="btn-primary" id="goToRecordBtn" type="button">+ Record a Sale</button>
+      <button class="btn-secondary" id="goToPurchaseBtn" type="button">+ Record a Purchase</button>
+    </div>
   </div>
 
   <div class="screen hidden" id="bookScreen">
@@ -162,14 +158,68 @@
       <button type="submit" id="submitBtn" class="btn-primary">Save to My Book</button>
       <p id="statusMessage"></p>
     </form>
-
     <button class="btn-text" id="backToListBtn" type="button">← Back to My Book</button>
   </div>
 
+  <!-- NEW: Record a Purchase — buying stock from a supplier -->
+  <div class="screen hidden" id="purchaseScreen">
+    <header>
+      <p class="eyebrow">My Book — New Entry</p>
+      <h1>Record a Purchase</h1>
+      <p class="helper">Buying stock or supplies? Record it here so your money out is tracked too.</p>
+    </header>
+
+    <form id="purchaseForm">
+      <label>
+        What did you buy?
+        <input type="text" id="purchaseItemName" placeholder="e.g. Rice (50kg bag)" required>
+      </label>
+      <div class="row">
+        <label>
+          How many?
+          <input type="number" id="purchaseQuantity" value="1" min="1" required>
+        </label>
+        <label>
+          Cost per one (₦)
+          <input type="number" id="purchaseUnitCost" placeholder="e.g. 45000" min="0" required>
+        </label>
+      </div>
+      <label>
+        Have you paid the supplier?
+        <select id="purchasePaymentStatus">
+          <option value="paid">Yes, fully paid</option>
+          <option value="owed">Not yet — I still owe them</option>
+        </select>
+      </label>
+      <label id="supplierField" class="hidden">
+        Who is the supplier?
+        <input type="text" id="supplierName" placeholder="e.g. Alhaji Musa Rice Depot">
+      </label>
+      <div class="total-preview">
+        <span>Total for this purchase</span>
+        <span id="purchaseTotalDisplay">₦0</span>
+      </div>
+      <button type="submit" id="purchaseSubmitBtn" class="btn-primary">Save Purchase</button>
+      <p id="purchaseStatusMessage"></p>
+    </form>
+    <button class="btn-text" id="backToListFromPurchaseBtn" type="button">← Back to My Book</button>
+  </div>
+
+</div>
+
+<!-- Simple action sheet for tapping a book row -->
+<div class="action-sheet-backdrop hidden" id="actionSheetBackdrop">
+  <div class="action-sheet">
+    <p class="action-sheet-title" id="actionSheetTitle">Entry</p>
+    <button class="action-sheet-btn mark-paid hidden" id="markPaidBtn" type="button">✓ Mark as Paid</button>
+    <button class="action-sheet-btn delete" id="deleteEntryBtn" type="button">🗑 Delete Entry</button>
+    <button class="action-sheet-btn cancel" id="cancelActionBtn" type="button">Cancel</button>
+  </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabaseClient.js"></script>
 <script src="app.js"></script>
 </body>
-</html>
+  </html>
+            
