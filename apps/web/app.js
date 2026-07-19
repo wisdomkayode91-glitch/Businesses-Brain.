@@ -1,4 +1,3 @@
-// LedgerMind — real test business ID already filled in below.
 const TEST_BUSINESS_ID = "1708f447-77b8-41d4-8764-64e5843bc2a2";
 
 function showScreen(id) {
@@ -97,9 +96,79 @@ document.getElementById('uploadPhotoBtn').addEventListener('click', () => {
 document.getElementById('noPhotoBtn').addEventListener('click', enterMyBook);
 
 function enterMyBook() {
-  showScreen('bookScreen');
+  showScreen('bookListScreen');
+  loadBookList();
 }
 
+document.getElementById('goToRecordBtn').addEventListener('click', () => {
+  showScreen('bookScreen');
+});
+document.getElementById('backToListBtn').addEventListener('click', () => {
+  showScreen('bookListScreen');
+  loadBookList();
+});
+
+// ── My Book list — fetches and renders real recorded sales ──
+async function loadBookList() {
+  const bookList = document.getElementById('bookList');
+  const emptyState = document.getElementById('emptyState');
+
+  if (typeof supabaseClient === 'undefined') {
+    bookList.innerHTML = '<p class="empty-state">Supabase is not connected yet.</p>';
+    return;
+  }
+
+  bookList.innerHTML = '<p class="empty-state">Loading your book...</p>';
+
+  try {
+    const { data, error } = await supabaseClient
+      .from('transactions')
+      .select('*, customers(name)')
+      .eq('business_id', TEST_BUSINESS_ID)
+      .order('created_at', { ascending: false })
+      .limit(20);
+
+    if (error) throw error;
+
+    if (!data || data.length === 0) {
+      bookList.innerHTML = '<p class="empty-state">Nothing recorded yet. Tap below to add your first sale.</p>';
+      return;
+    }
+
+    bookList.innerHTML = '';
+    data.forEach(tx => {
+      const row = document.createElement('div');
+      row.className = 'book-row';
+
+      const isOwed = tx.status === 'owed';
+      const title = isOwed && tx.customers?.name
+        ? `${tx.customers.name} owes you`
+        : 'Sale';
+
+      const date = new Date(tx.created_at).toLocaleDateString('en-NG', {
+        month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+      });
+
+      row.innerHTML = `
+        <div class="book-row-left">
+          <div class="book-row-title">${title}</div>
+          <div class="book-row-date">${date}</div>
+        </div>
+        <div class="book-row-right">
+          <div class="book-row-amount">₦${Number(tx.total_amount).toLocaleString('en-NG')}</div>
+          <div class="book-row-status ${isOwed ? 'owed' : 'paid'}">${isOwed ? 'Owed' : 'Paid'}</div>
+        </div>
+      `;
+      bookList.appendChild(row);
+    });
+
+  } catch (err) {
+    console.error(err);
+    bookList.innerHTML = '<p class="empty-state">Could not load your book — check your connection.</p>';
+  }
+}
+
+// ── Record a Sale form ────────────────────────────────────
 const form = document.getElementById('saleForm');
 const itemName = document.getElementById('itemName');
 const quantity = document.getElementById('quantity');
@@ -202,6 +271,11 @@ form.addEventListener('submit', async (e) => {
     updateTotal();
     customerField.classList.add('hidden');
 
+    setTimeout(() => {
+      showScreen('bookListScreen');
+      loadBookList();
+    }, 900);
+
   } catch (err) {
     console.error(err);
     statusMessage.textContent = 'Something went wrong — check the browser console.';
@@ -210,4 +284,4 @@ form.addEventListener('submit', async (e) => {
     submitBtn.disabled = false;
   }
 });
-        
+                 
