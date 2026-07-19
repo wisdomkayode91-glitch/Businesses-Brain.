@@ -1,4 +1,4 @@
- :root {
+:root {
   --bg: #F9F7F2;
   --surface: #F0EBE1;
   --surface-2: #E5DDCF;
@@ -42,7 +42,6 @@ body {
   flex-direction: column;
 }
 
-/* Logo header — inline SVG, stacked, centered */
 .brand-header {
   padding: 24px 24px 14px;
   display: flex;
@@ -239,4 +238,3 @@ form { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
 #statusMessage { font-size: 13px; text-align: center; min-height: 18px; margin-top: 8px; }
 #statusMessage.success { color: var(--positive); }
 #statusMessage.error { color: var(--critical); }
-  
