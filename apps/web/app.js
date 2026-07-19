@@ -1,4 +1,5 @@
-const TEST_BUSINESS_ID = "PASTE_A_TEST_BUSINESS_UUID_HERE";
+// LedgerMind — real test business ID already filled in below.
+const TEST_BUSINESS_ID = "1708f447-77b8-41d4-8764-64e5843bc2a2";
 
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
@@ -133,7 +134,7 @@ form.addEventListener('submit', async (e) => {
   statusMessage.className = '';
 
   if (typeof supabaseClient === 'undefined') {
-    statusMessage.textContent = 'Supabase is not connected yet — set up supabaseClient.js first.';
+    statusMessage.textContent = 'Supabase is not connected yet — check supabaseClient.js.';
     statusMessage.className = 'error';
     submitBtn.disabled = false;
     return;
@@ -209,4 +210,4 @@ form.addEventListener('submit', async (e) => {
     submitBtn.disabled = false;
   }
 });
-  
+        
