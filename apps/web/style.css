@@ -29,8 +29,6 @@ body {
   .phone { border-radius: 0; min-height: 100vh; box-shadow: none; }
 }
 
-/* On real desktop/laptop widths, give the card a bit more breathing room
-   instead of staying locked to phone width — makes the table more usable. */
 @media (min-width: 900px) {
   .phone { width: 520px; }
 }
@@ -108,7 +106,7 @@ p { color: var(--text-dim); font-size: 14.5px; line-height: 1.55; }
 }
 .btn-secondary:active { transform: scale(0.98); }
 
-.two-btn-row { display: flex; flex-direction: column; gap: 10px; margin-top: auto; }
+.two-btn-row { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
 .two-btn-row .btn-primary { margin-top: 0; }
 
 .btn-text {
@@ -151,22 +149,23 @@ form { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
 .success { color: var(--positive); }
 .error { color: var(--critical); }
 
-/* My Book — real table, horizontally scrollable so it never breaks on narrow phones */
+/* Tables (shared by My Book and My Stock) */
 .table-wrap {
   flex: 1;
   overflow-x: auto;
   overflow-y: auto;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
   border-radius: 12px;
   border: 1px solid var(--border);
 }
 
 .book-table {
   width: 100%;
-  min-width: 480px; /* forces horizontal scroll on narrow screens instead of squashing columns unreadably */
+  min-width: 480px;
   border-collapse: collapse;
   font-size: 13.5px;
 }
+#stockTable { min-width: 260px; }
 
 .book-table thead th {
   background: var(--surface-2);
@@ -180,8 +179,7 @@ form { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
   position: sticky;
   top: 0;
 }
-.book-table thead th:nth-child(3),
-.book-table thead th:nth-child(4) { text-align: right; }
+.book-table thead th:not(:first-child) { text-align: right; }
 
 .book-table tbody tr {
   cursor: pointer;
@@ -196,10 +194,12 @@ form { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
   color: var(--text);
   vertical-align: middle;
 }
-.book-table td:nth-child(1) { font-weight: 600; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.book-table td:nth-child(2) { color: var(--text-dim); white-space: nowrap; }
-.book-table td:nth-child(3) { text-align: right; font-family: 'Fraunces', serif; font-variant-numeric: tabular-nums; white-space: nowrap; }
-.book-table td:nth-child(4) { text-align: right; white-space: nowrap; }
+.book-table td:first-child { font-weight: 600; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.book-table td:not(:first-child) { text-align: right; white-space: nowrap; }
+#bookTable td:nth-child(3) { font-family: 'Fraunces', serif; font-variant-numeric: tabular-nums; }
+#stockTable td:nth-child(2) { font-family: 'Fraunces', serif; font-variant-numeric: tabular-nums; font-size: 15px; }
+
+.stock-low { color: var(--critical) !important; }
 
 .status-pill {
   display: inline-block;
@@ -216,7 +216,6 @@ form { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
 
 .empty-state { text-align: center; padding: 40px 20px; color: var(--text-dim); font-style: italic; }
 
-/* Action sheet */
 .action-sheet-backdrop {
   position: fixed; inset: 0; background: rgba(43,36,22,0.4); display: flex;
   align-items: flex-end; justify-content: center; z-index: 100;
@@ -230,4 +229,4 @@ form { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
 .action-sheet-btn.mark-paid { background: var(--positive); color: #fff; }
 .action-sheet-btn.delete { background: var(--surface); color: var(--critical); }
 .action-sheet-btn.cancel { background: none; color: var(--text-dim); }
-  
+         
