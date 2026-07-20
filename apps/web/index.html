@@ -98,16 +98,28 @@
     <button class="btn-text" id="noPhotoBtn" type="button">I'll start fresh instead</button>
   </div>
 
-  <!-- MY BOOK LIST — now with tap-to-manage on each row -->
+  <!-- MY BOOK — now a real table, horizontally scrollable if needed -->
   <div class="screen hidden" id="bookListScreen">
     <header>
       <p class="eyebrow">My Book</p>
       <h1>Your Sales &amp; Debts</h1>
-      <p class="helper">Tap any entry to mark it paid or delete it.</p>
+      <p class="helper">Tap any row to mark it paid or delete it.</p>
     </header>
 
-    <div id="bookList" class="book-list">
-      <p class="empty-state" id="emptyState">Nothing recorded yet. Tap below to add your first sale.</p>
+    <div class="table-wrap">
+      <table class="book-table" id="bookTable">
+        <thead>
+          <tr>
+            <th>Description</th>
+            <th>Date</th>
+            <th>Amount</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="bookTableBody">
+          <tr><td colspan="4" class="empty-state">Nothing recorded yet. Tap below to add your first sale.</td></tr>
+        </tbody>
+      </table>
     </div>
 
     <div class="two-btn-row">
@@ -161,7 +173,6 @@
     <button class="btn-text" id="backToListBtn" type="button">← Back to My Book</button>
   </div>
 
-  <!-- NEW: Record a Purchase — buying stock from a supplier -->
   <div class="screen hidden" id="purchaseScreen">
     <header>
       <p class="eyebrow">My Book — New Entry</p>
@@ -207,7 +218,6 @@
 
 </div>
 
-<!-- Simple action sheet for tapping a book row -->
 <div class="action-sheet-backdrop hidden" id="actionSheetBackdrop">
   <div class="action-sheet">
     <p class="action-sheet-title" id="actionSheetTitle">Entry</p>
