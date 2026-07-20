@@ -98,8 +98,48 @@ document.getElementById('goToRecordBtn').addEventListener('click', () => showScr
 document.getElementById('goToPurchaseBtn').addEventListener('click', () => showScreen('purchaseScreen'));
 document.getElementById('backToListBtn').addEventListener('click', () => { showScreen('bookListScreen'); loadBookList(); });
 document.getElementById('backToListFromPurchaseBtn').addEventListener('click', () => { showScreen('bookListScreen'); loadBookList(); });
+document.getElementById('goToStockBtn').addEventListener('click', () => { showScreen('stockScreen'); loadStockList(); });
+document.getElementById('backToListFromStockBtn').addEventListener('click', () => { showScreen('bookListScreen'); loadBookList(); });
 
-// ── My Book — now renders as real table rows ──────────────
+// ── My Stock — real quantities ─────────────────────────────
+const LOW_STOCK_THRESHOLD = 5; // simple flat threshold for now; per-item reorder points come later
+
+async function loadStockList() {
+  const tbody = document.getElementById('stockTableBody');
+  tbody.innerHTML = '<tr><td colspan="2" class="empty-state">Loading your stock...</td></tr>';
+
+  try {
+    const { data, error } = await supabaseClient
+      .from('items')
+      .select('name, stock_quantity')
+      .eq('business_id', TEST_BUSINESS_ID)
+      .eq('tracks_inventory', true)
+      .order('name', { ascending: true });
+
+    if (error) throw error;
+
+    if (!data || data.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="2" class="empty-state">No items recorded yet.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = '';
+    data.forEach(item => {
+      const qty = Number(item.stock_quantity) || 0;
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${item.name}</td>
+        <td class="${qty <= LOW_STOCK_THRESHOLD ? 'stock-low' : ''}">${qty}${qty <= LOW_STOCK_THRESHOLD ? ' ⚠' : ''}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  } catch (err) {
+    console.error(err);
+    tbody.innerHTML = '<tr><td colspan="2" class="empty-state">Could not load stock — check your connection.</td></tr>';
+  }
+}
+
+// ── My Book list ────────────────────────────────────────────
 let selectedEntry = null;
 
 async function loadBookList() {
@@ -268,6 +308,18 @@ deleteEntryBtn.addEventListener('click', async () => {
   }
 });
 
+// ── Helper: adjust an item's real stock count ──────────────
+async function adjustStock(itemId, delta) {
+  const { data: item, error } = await supabaseClient
+    .from('items').select('stock_quantity').eq('id', itemId).single();
+  if (error) throw error;
+
+  const newQty = (Number(item.stock_quantity) || 0) + delta;
+  const { error: updateError } = await supabaseClient
+    .from('items').update({ stock_quantity: newQty }).eq('id', itemId);
+  if (updateError) throw updateError;
+}
+
 // ── Record a Sale ─────────────────────────────────────────
 const form = document.getElementById('saleForm');
 const itemName = document.getElementById('itemName');
@@ -318,7 +370,7 @@ form.addEventListener('submit', async (e) => {
     let itemId = existingItem?.id;
     if (!itemId) {
       const { data: newItem, error } = await supabaseClient.from('items')
-        .insert({ business_id: TEST_BUSINESS_ID, name: itemName.value, unit_price: price }).select('id').single();
+        .insert({ business_id: TEST_BUSINESS_ID, name: itemName.value, unit_price: price, stock_quantity: 0 }).select('id').single();
       if (error) throw error;
       itemId = newItem.id;
     }
@@ -352,6 +404,9 @@ form.addEventListener('submit', async (e) => {
     await supabaseClient.from('inventory_movements').insert({
       business_id: TEST_BUSINESS_ID, item_id: itemId, type: 'sale', quantity: -qty, reason: 'Sale recorded'
     });
+
+    // Real stock count now actually updates
+    await adjustStock(itemId, -qty);
 
     statusMessage.textContent = 'Saved to My Book ✓';
     statusMessage.className = 'success';
@@ -416,7 +471,7 @@ purchaseForm.addEventListener('submit', async (e) => {
     let itemId = existingItem?.id;
     if (!itemId) {
       const { data: newItem, error } = await supabaseClient.from('items')
-        .insert({ business_id: TEST_BUSINESS_ID, name: purchaseItemName.value, cost_price: cost }).select('id').single();
+        .insert({ business_id: TEST_BUSINESS_ID, name: purchaseItemName.value, cost_price: cost, stock_quantity: 0 }).select('id').single();
       if (error) throw error;
       itemId = newItem.id;
     }
@@ -425,46 +480,7 @@ purchaseForm.addEventListener('submit', async (e) => {
       business_id: TEST_BUSINESS_ID, item_id: itemId, type: 'restock', quantity: qty, reason: 'Stock purchased'
     });
 
-    const linkedToNote = isOwed
-      ? `${purchaseItemName.value} — owed to ${supplierName.value}`
-      : purchaseItemName.value;
+    // Real stock count now actually updates
+    await adjustStock(itemId, qty);
 
-    const { data: expense, error: expenseError } = await supabaseClient.from('expenses').insert({
-      business_id: TEST_BUSINESS_ID, category: 'Stock Purchase', amount: total, linked_to: linkedToNote
-    }).select('id').single();
-    if (expenseError) throw expenseError;
-
-    if (isOwed) {
-      let { data: existingSupplier } = await supabaseClient
-        .from('suppliers').select('id').eq('business_id', TEST_BUSINESS_ID).eq('name', supplierName.value).maybeSingle();
-      let supplierId = existingSupplier?.id;
-      if (!supplierId) {
-        const { data: newSupplier, error: supplierError } = await supabaseClient
-          .from('suppliers').insert({ business_id: TEST_BUSINESS_ID, name: supplierName.value })
-          .select('id').single();
-        if (supplierError) throw supplierError;
-        supplierId = newSupplier.id;
-      }
-
-      const { error: payableError } = await supabaseClient.from('ledger_entries').insert({
-        business_id: TEST_BUSINESS_ID, supplier_id: supplierId, direction: 'payable',
-        amount_owed: total, amount_paid: 0, status: 'current',
-        attributes: { expense_id: expense.id }
-      });
-      if (payableError) throw payableError;
-    }
-
-    purchaseStatusMessage.textContent = 'Purchase saved ✓';
-    purchaseStatusMessage.className = 'success';
-    purchaseForm.reset(); updatePurchaseTotal(); supplierField.classList.add('hidden');
-    setTimeout(() => { showScreen('bookListScreen'); loadBookList(); }, 900);
-
-  } catch (err) {
-    console.error(err);
-    purchaseStatusMessage.textContent = 'Something went wrong — check the browser console.';
-    purchaseStatusMessage.className = 'error';
-  } finally {
-    purchaseSubmitBtn.disabled = false;
-  }
-});
-      
+    const linkedToNote 
