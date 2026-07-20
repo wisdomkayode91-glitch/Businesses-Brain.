@@ -98,7 +98,6 @@
     <button class="btn-text" id="noPhotoBtn" type="button">I'll start fresh instead</button>
   </div>
 
-  <!-- MY BOOK — now a real table, horizontally scrollable if needed -->
   <div class="screen hidden" id="bookListScreen">
     <header>
       <p class="eyebrow">My Book</p>
@@ -109,12 +108,7 @@
     <div class="table-wrap">
       <table class="book-table" id="bookTable">
         <thead>
-          <tr>
-            <th>Description</th>
-            <th>Date</th>
-            <th>Amount</th>
-            <th>Status</th>
-          </tr>
+          <tr><th>Description</th><th>Date</th><th>Amount</th><th>Status</th></tr>
         </thead>
         <tbody id="bookTableBody">
           <tr><td colspan="4" class="empty-state">Nothing recorded yet. Tap below to add your first sale.</td></tr>
@@ -122,10 +116,34 @@
       </table>
     </div>
 
+    <button class="btn-text" id="goToStockBtn" type="button">📦 View My Stock</button>
+
     <div class="two-btn-row">
       <button class="btn-primary" id="goToRecordBtn" type="button">+ Record a Sale</button>
       <button class="btn-secondary" id="goToPurchaseBtn" type="button">+ Record a Purchase</button>
     </div>
+  </div>
+
+  <!-- NEW: My Stock — real quantities, finally -->
+  <div class="screen hidden" id="stockScreen">
+    <header>
+      <p class="eyebrow">My Book</p>
+      <h1>My Stock</h1>
+      <p class="helper">What you actually have right now, updated automatically as you sell and restock.</p>
+    </header>
+
+    <div class="table-wrap">
+      <table class="book-table" id="stockTable">
+        <thead>
+          <tr><th>Item</th><th>In Stock</th></tr>
+        </thead>
+        <tbody id="stockTableBody">
+          <tr><td colspan="2" class="empty-state">No items recorded yet.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <button class="btn-text" id="backToListFromStockBtn" type="button">← Back to My Book</button>
   </div>
 
   <div class="screen hidden" id="bookScreen">
