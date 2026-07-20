@@ -98,6 +98,21 @@
     <button class="btn-text" id="noPhotoBtn" type="button">I'll start fresh instead</button>
   </div>
 
+  <!-- NEW: Daily Briefing — the real landing screen from now on -->
+  <div class="screen hidden" id="briefingScreen">
+    <div class="briefing-glow"></div>
+    <header>
+      <p class="eyebrow" id="briefingDate">Today</p>
+      <h1 id="briefingGreeting">Good day.</h1>
+    </header>
+
+    <div id="briefingBody" class="briefing-body">
+      <p class="empty-state">Loading your briefing...</p>
+    </div>
+
+    <button class="btn-primary" id="goToBookFromBriefingBtn" type="button">Open My Book</button>
+  </div>
+
   <div class="screen hidden" id="bookListScreen">
     <header>
       <p class="eyebrow">My Book</p>
@@ -117,6 +132,7 @@
     </div>
 
     <button class="btn-text" id="goToStockBtn" type="button">📦 View My Stock</button>
+    <button class="btn-text" id="backToBriefingBtn" type="button">🏠 Back to Briefing</button>
 
     <div class="two-btn-row">
       <button class="btn-primary" id="goToRecordBtn" type="button">+ Record a Sale</button>
@@ -124,7 +140,6 @@
     </div>
   </div>
 
-  <!-- NEW: My Stock — real quantities, finally -->
   <div class="screen hidden" id="stockScreen">
     <header>
       <p class="eyebrow">My Book</p>
@@ -249,5 +264,5 @@
 <script src="supabaseClient.js"></script>
 <script src="app.js"></script>
 </body>
-  </html>
-  
+          </html>
+        
