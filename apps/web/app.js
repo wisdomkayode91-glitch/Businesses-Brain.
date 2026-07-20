@@ -99,18 +99,18 @@ document.getElementById('goToPurchaseBtn').addEventListener('click', () => showS
 document.getElementById('backToListBtn').addEventListener('click', () => { showScreen('bookListScreen'); loadBookList(); });
 document.getElementById('backToListFromPurchaseBtn').addEventListener('click', () => { showScreen('bookListScreen'); loadBookList(); });
 
-// ── My Book list — merges sales + purchases, now with real payable status ──
-let selectedEntry = null; // { id, kind: 'sale'|'purchase', isOwed, ledgerEntryId }
+// ── My Book — now renders as real table rows ──────────────
+let selectedEntry = null;
 
 async function loadBookList() {
-  const bookList = document.getElementById('bookList');
+  const tbody = document.getElementById('bookTableBody');
 
   if (typeof supabaseClient === 'undefined') {
-    bookList.innerHTML = '<p class="empty-state">Supabase is not connected yet.</p>';
+    tbody.innerHTML = '<tr><td colspan="4" class="empty-state">Supabase is not connected yet.</td></tr>';
     return;
   }
 
-  bookList.innerHTML = '<p class="empty-state">Loading your book...</p>';
+  tbody.innerHTML = '<tr><td colspan="4" class="empty-state">Loading your book...</td></tr>';
 
   try {
     const [salesRes, purchasesRes, payablesRes] = await Promise.all([
@@ -127,7 +127,6 @@ async function loadBookList() {
     if (purchasesRes.error) throw purchasesRes.error;
     if (payablesRes.error) throw payablesRes.error;
 
-    // Map expense id -> open payable ledger entry, using the expense_id we stored in attributes
     const payableByExpenseId = {};
     (payablesRes.data || []).forEach(le => {
       const expenseId = le.attributes?.expense_id;
@@ -156,15 +155,15 @@ async function loadBookList() {
     const combined = [...sales, ...purchases].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
     if (combined.length === 0) {
-      bookList.innerHTML = '<p class="empty-state">Nothing recorded yet. Tap below to add your first sale.</p>';
+      tbody.innerHTML = '<tr><td colspan="4" class="empty-state">Nothing recorded yet. Tap below to add your first sale.</td></tr>';
       return;
     }
 
-    bookList.innerHTML = '';
+    tbody.innerHTML = '';
     combined.forEach(entry => {
-      const row = document.createElement('div');
-      row.className = 'book-row';
+      const tr = document.createElement('tr');
       const date = new Date(entry.created_at).toLocaleDateString('en-NG', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+
       let statusLabel, statusClass;
       if (entry.kind === 'purchase') {
         statusLabel = entry.isOwed ? 'You Owe' : 'Purchase';
@@ -174,27 +173,23 @@ async function loadBookList() {
         statusClass = entry.isOwed ? 'owed' : 'paid';
       }
 
-      row.innerHTML = `
-        <div class="book-row-left">
-          <div class="book-row-title">${entry.title}</div>
-          <div class="book-row-date">${date}</div>
-        </div>
-        <div class="book-row-right">
-          <div class="book-row-amount">₦${Number(entry.amount).toLocaleString('en-NG')}</div>
-          <div class="book-row-status ${statusClass}">${statusLabel}</div>
-        </div>
+      tr.innerHTML = `
+        <td>${entry.title}</td>
+        <td>${date}</td>
+        <td>₦${Number(entry.amount).toLocaleString('en-NG')}</td>
+        <td><span class="status-pill ${statusClass}">${statusLabel}</span></td>
       `;
-      row.addEventListener('click', () => openActionSheet(entry));
-      bookList.appendChild(row);
+      tr.addEventListener('click', () => openActionSheet(entry));
+      tbody.appendChild(tr);
     });
 
   } catch (err) {
     console.error(err);
-    bookList.innerHTML = '<p class="empty-state">Could not load your book — check your connection.</p>';
+    tbody.innerHTML = '<tr><td colspan="4" class="empty-state">Could not load your book — check your connection.</td></tr>';
   }
 }
 
-// ── Action sheet: Mark as Paid / Delete — works for both directions now ──
+// ── Action sheet ───────────────────────────────────────────
 const actionSheetBackdrop = document.getElementById('actionSheetBackdrop');
 const actionSheetTitle = document.getElementById('actionSheetTitle');
 const markPaidBtn = document.getElementById('markPaidBtn');
@@ -232,7 +227,6 @@ markPaidBtn.addEventListener('click', async () => {
         .eq('linked_transaction_id', selectedEntry.id);
 
     } else {
-      // purchase — settling what you owe a supplier
       if (!selectedEntry.ledgerEntryId) throw new Error('No open supplier debt found for this entry.');
 
       const { data: le, error: fetchErr } = await supabaseClient
@@ -373,7 +367,7 @@ form.addEventListener('submit', async (e) => {
   }
 });
 
-// ── Record a Purchase — now creates a real payable debt when unpaid ──
+// ── Record a Purchase ─────────────────────────────────────
 const purchaseForm = document.getElementById('purchaseForm');
 const purchaseItemName = document.getElementById('purchaseItemName');
 const purchaseQuantity = document.getElementById('purchaseQuantity');
@@ -452,11 +446,12 @@ purchaseForm.addEventListener('submit', async (e) => {
         supplierId = newSupplier.id;
       }
 
-      await supabaseClient.from('ledger_entries').insert({
+      const { error: payableError } = await supabaseClient.from('ledger_entries').insert({
         business_id: TEST_BUSINESS_ID, supplier_id: supplierId, direction: 'payable',
         amount_owed: total, amount_paid: 0, status: 'current',
         attributes: { expense_id: expense.id }
       });
+      if (payableError) throw payableError;
     }
 
     purchaseStatusMessage.textContent = 'Purchase saved ✓';
@@ -472,4 +467,4 @@ purchaseForm.addEventListener('submit', async (e) => {
     purchaseSubmitBtn.disabled = false;
   }
 });
-  
+      
