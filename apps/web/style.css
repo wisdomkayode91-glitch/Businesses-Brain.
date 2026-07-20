@@ -29,6 +29,12 @@ body {
   .phone { border-radius: 0; min-height: 100vh; box-shadow: none; }
 }
 
+/* On real desktop/laptop widths, give the card a bit more breathing room
+   instead of staying locked to phone width — makes the table more usable. */
+@media (min-width: 900px) {
+  .phone { width: 520px; }
+}
+
 .phone {
   width: 375px;
   max-width: 100%;
@@ -145,26 +151,70 @@ form { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
 .success { color: var(--positive); }
 .error { color: var(--critical); }
 
-/* My Book list */
-.book-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
-.empty-state { text-align: center; padding: 40px 20px; color: var(--text-dim); font-style: italic; }
-
-.book-row {
-  background: var(--surface); border-radius: 12px; padding: 14px 16px; display: flex;
-  justify-content: space-between; align-items: center; gap: 10px; cursor: pointer; transition: background 0.15s ease;
+/* My Book — real table, horizontally scrollable so it never breaks on narrow phones */
+.table-wrap {
+  flex: 1;
+  overflow-x: auto;
+  overflow-y: auto;
+  margin-bottom: 20px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
 }
-.book-row:active { background: var(--surface-2); }
 
-.book-row-left { min-width: 0; }
-.book-row-title { font-size: 14.5px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.book-row-date { font-size: 12px; color: var(--text-dim); margin-top: 2px; }
+.book-table {
+  width: 100%;
+  min-width: 480px; /* forces horizontal scroll on narrow screens instead of squashing columns unreadably */
+  border-collapse: collapse;
+  font-size: 13.5px;
+}
 
-.book-row-right { text-align: right; flex-shrink: 0; }
-.book-row-amount { font-family: 'Fraunces', serif; font-size: 16px; color: var(--text); font-variant-numeric: tabular-nums; }
-.book-row-status { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; margin-top: 2px; }
-.book-row-status.paid { color: var(--positive); }
-.book-row-status.owed { color: var(--caution); }
-.book-row-status.purchase { color: var(--text-dim); }
+.book-table thead th {
+  background: var(--surface-2);
+  color: var(--text-dim);
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  font-weight: 600;
+  text-align: left;
+  padding: 10px 14px;
+  position: sticky;
+  top: 0;
+}
+.book-table thead th:nth-child(3),
+.book-table thead th:nth-child(4) { text-align: right; }
+
+.book-table tbody tr {
+  cursor: pointer;
+  transition: background 0.15s ease;
+  border-top: 1px solid var(--border);
+}
+.book-table tbody tr:hover { background: var(--surface); }
+.book-table tbody tr:active { background: var(--surface-2); }
+
+.book-table td {
+  padding: 12px 14px;
+  color: var(--text);
+  vertical-align: middle;
+}
+.book-table td:nth-child(1) { font-weight: 600; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.book-table td:nth-child(2) { color: var(--text-dim); white-space: nowrap; }
+.book-table td:nth-child(3) { text-align: right; font-family: 'Fraunces', serif; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.book-table td:nth-child(4) { text-align: right; white-space: nowrap; }
+
+.status-pill {
+  display: inline-block;
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 3px 9px;
+  border-radius: 20px;
+}
+.status-pill.paid { background: rgba(63,122,92,0.14); color: var(--positive); }
+.status-pill.owed { background: rgba(181,101,46,0.14); color: var(--caution); }
+.status-pill.purchase { background: var(--surface-2); color: var(--text-dim); }
+
+.empty-state { text-align: center; padding: 40px 20px; color: var(--text-dim); font-style: italic; }
 
 /* Action sheet */
 .action-sheet-backdrop {
@@ -176,10 +226,8 @@ form { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
   padding: 20px; display: flex; flex-direction: column; gap: 10px;
 }
 .action-sheet-title { font-size: 13px; color: var(--text-dim); text-align: center; margin-bottom: 6px; }
-.action-sheet-btn {
-  border: none; border-radius: 12px; padding: 15px; font-family: 'Inter', sans-serif;
-  font-weight: 600; font-size: 14.5px; cursor: pointer;
-}
+.action-sheet-btn { border: none; border-radius: 12px; padding: 15px; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 14.5px; cursor: pointer; }
 .action-sheet-btn.mark-paid { background: var(--positive); color: #fff; }
 .action-sheet-btn.delete { background: var(--surface); color: var(--critical); }
 .action-sheet-btn.cancel { background: none; color: var(--text-dim); }
+  
