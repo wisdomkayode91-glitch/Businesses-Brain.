@@ -1,4 +1,5 @@
 const TEST_BUSINESS_ID = "1708f447-77b8-41d4-8764-64e5843bc2a2";
+const LOW_STOCK_THRESHOLD = 5;
 
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
@@ -90,10 +91,12 @@ document.getElementById('uploadPhotoBtn').addEventListener('click', () => {
 document.getElementById('noPhotoBtn').addEventListener('click', enterMyBook);
 
 function enterMyBook() {
-  showScreen('bookListScreen');
-  loadBookList();
+  showScreen('briefingScreen');
+  loadBriefing();
 }
 
+document.getElementById('goToBookFromBriefingBtn').addEventListener('click', () => { showScreen('bookListScreen'); loadBookList(); });
+document.getElementById('backToBriefingBtn').addEventListener('click', () => { showScreen('briefingScreen'); loadBriefing(); });
 document.getElementById('goToRecordBtn').addEventListener('click', () => showScreen('bookScreen'));
 document.getElementById('goToPurchaseBtn').addEventListener('click', () => showScreen('purchaseScreen'));
 document.getElementById('backToListBtn').addEventListener('click', () => { showScreen('bookListScreen'); loadBookList(); });
@@ -101,21 +104,92 @@ document.getElementById('backToListFromPurchaseBtn').addEventListener('click', (
 document.getElementById('goToStockBtn').addEventListener('click', () => { showScreen('stockScreen'); loadStockList(); });
 document.getElementById('backToListFromStockBtn').addEventListener('click', () => { showScreen('bookListScreen'); loadBookList(); });
 
-// ── My Stock — real quantities ─────────────────────────────
-const LOW_STOCK_THRESHOLD = 5; // simple flat threshold for now; per-item reorder points come later
+// ── Daily Briefing — real data, honest cold-start rule ────
+function line(text, type = 'neutral') {
+  return `<div class="briefing-line ${type}">${text}</div>`;
+}
 
+async function loadBriefing() {
+  const body = document.getElementById('briefingBody');
+  const dateEl = document.getElementById('briefingDate');
+  const greetingEl = document.getElementById('briefingGreeting');
+
+  const now = new Date();
+  dateEl.textContent = now.toLocaleDateString('en-NG', { weekday: 'long', day: 'numeric', month: 'long' });
+  const hour = now.getHours();
+  const timeGreeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+  greetingEl.textContent = businessName ? `${timeGreeting}, ${businessName}.` : `${timeGreeting}.`;
+
+  body.innerHTML = '<p class="empty-state">Reading your book...</p>';
+
+  try {
+    const startOfYesterday = new Date(now); startOfYesterday.setDate(now.getDate() - 1); startOfYesterday.setHours(0, 0, 0, 0);
+    const startOfToday = new Date(now); startOfToday.setHours(0, 0, 0, 0);
+
+    const [everRes, yesterdayRes, lowStockRes, receivableRes, payableRes] = await Promise.all([
+      supabaseClient.from('transactions').select('id', { count: 'exact', head: true }).eq('business_id', TEST_BUSINESS_ID),
+      supabaseClient.from('transactions').select('total_amount')
+        .eq('business_id', TEST_BUSINESS_ID)
+        .gte('created_at', startOfYesterday.toISOString()).lt('created_at', startOfToday.toISOString()),
+      supabaseClient.from('items').select('name')
+        .eq('business_id', TEST_BUSINESS_ID).eq('tracks_inventory', true).lte('stock_quantity', LOW_STOCK_THRESHOLD),
+      supabaseClient.from('ledger_entries').select('amount_owed')
+        .eq('business_id', TEST_BUSINESS_ID).eq('direction', 'receivable').eq('status', 'current'),
+      supabaseClient.from('ledger_entries').select('amount_owed')
+        .eq('business_id', TEST_BUSINESS_ID).eq('direction', 'payable').eq('status', 'current')
+    ]);
+
+    const hasAnyHistory = (everRes.count || 0) > 0;
+
+    if (!hasAnyHistory) {
+      body.innerHTML = line("You're just getting started — nothing recorded yet. Once you log a few sales, I'll start noticing patterns and warning you before problems happen.");
+      return;
+    }
+
+    const lines = [];
+
+    const yesterdayTotal = (yesterdayRes.data || []).reduce((sum, tx) => sum + Number(tx.total_amount), 0);
+    if (yesterdayTotal > 0) {
+      lines.push(line(`Yesterday you sold <strong>₦${yesterdayTotal.toLocaleString('en-NG')}</strong>.`, 'positive'));
+    } else {
+      lines.push(line('No sales were recorded yesterday.', 'neutral'));
+    }
+
+    const lowStockItems = lowStockRes.data || [];
+    if (lowStockItems.length > 0) {
+      const names = lowStockItems.slice(0, 3).map(i => i.name).join(', ');
+      const extra = lowStockItems.length > 3 ? ` and ${lowStockItems.length - 3} more` : '';
+      lines.push(line(`Running low on <strong>${names}</strong>${extra} — check My Stock before you run out.`, 'caution'));
+    }
+
+    const totalReceivable = (receivableRes.data || []).reduce((sum, le) => sum + Number(le.amount_owed), 0);
+    if (totalReceivable > 0) {
+      lines.push(line(`Customers currently owe you <strong>₦${totalReceivable.toLocaleString('en-NG')}</strong> in total.`, 'caution'));
+    }
+
+    const totalPayable = (payableRes.data || []).reduce((sum, le) => sum + Number(le.amount_owed), 0);
+    if (totalPayable > 0) {
+      lines.push(line(`You currently owe suppliers <strong>₦${totalPayable.toLocaleString('en-NG')}</strong> in total.`, 'caution'));
+    }
+
+    body.innerHTML = lines.join('');
+
+  } catch (err) {
+    console.error(err);
+    body.innerHTML = line('Could not load your briefing — check your connection.');
+  }
+}
+
+// ── My Stock ────────────────────────────────────────────────
 async function loadStockList() {
   const tbody = document.getElementById('stockTableBody');
   tbody.innerHTML = '<tr><td colspan="2" class="empty-state">Loading your stock...</td></tr>';
 
   try {
     const { data, error } = await supabaseClient
-      .from('items')
-      .select('name, stock_quantity')
-      .eq('business_id', TEST_BUSINESS_ID)
-      .eq('tracks_inventory', true)
+      .from('items').select('name, stock_quantity')
+      .eq('business_id', TEST_BUSINESS_ID).eq('tracks_inventory', true)
       .order('name', { ascending: true });
-
     if (error) throw error;
 
     if (!data || data.length === 0) {
@@ -127,10 +201,7 @@ async function loadStockList() {
     data.forEach(item => {
       const qty = Number(item.stock_quantity) || 0;
       const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${item.name}</td>
-        <td class="${qty <= LOW_STOCK_THRESHOLD ? 'stock-low' : ''}">${qty}${qty <= LOW_STOCK_THRESHOLD ? ' ⚠' : ''}</td>
-      `;
+      tr.innerHTML = `<td>${item.name}</td><td class="${qty <= LOW_STOCK_THRESHOLD ? 'stock-low' : ''}">${qty}${qty <= LOW_STOCK_THRESHOLD ? ' ⚠' : ''}</td>`;
       tbody.appendChild(tr);
     });
   } catch (err) {
@@ -144,12 +215,10 @@ let selectedEntry = null;
 
 async function loadBookList() {
   const tbody = document.getElementById('bookTableBody');
-
   if (typeof supabaseClient === 'undefined') {
     tbody.innerHTML = '<tr><td colspan="4" class="empty-state">Supabase is not connected yet.</td></tr>';
     return;
   }
-
   tbody.innerHTML = '<tr><td colspan="4" class="empty-state">Loading your book...</td></tr>';
 
   try {
@@ -203,7 +272,6 @@ async function loadBookList() {
     combined.forEach(entry => {
       const tr = document.createElement('tr');
       const date = new Date(entry.created_at).toLocaleDateString('en-NG', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-
       let statusLabel, statusClass;
       if (entry.kind === 'purchase') {
         statusLabel = entry.isOwed ? 'You Owe' : 'Purchase';
@@ -212,7 +280,6 @@ async function loadBookList() {
         statusLabel = entry.isOwed ? 'Owed' : 'Paid';
         statusClass = entry.isOwed ? 'owed' : 'paid';
       }
-
       tr.innerHTML = `
         <td>${entry.title}</td>
         <td>${date}</td>
@@ -222,7 +289,6 @@ async function loadBookList() {
       tr.addEventListener('click', () => openActionSheet(entry));
       tbody.appendChild(tr);
     });
-
   } catch (err) {
     console.error(err);
     tbody.innerHTML = '<tr><td colspan="4" class="empty-state">Could not load your book — check your connection.</td></tr>';
@@ -257,27 +323,18 @@ markPaidBtn.addEventListener('click', async () => {
       const { data: tx, error: fetchErr } = await supabaseClient
         .from('transactions').select('total_amount').eq('id', selectedEntry.id).single();
       if (fetchErr) throw fetchErr;
-
       await supabaseClient.from('transactions')
-        .update({ status: 'paid', amount_paid: tx.total_amount, amount_owed: 0 })
-        .eq('id', selectedEntry.id);
-
+        .update({ status: 'paid', amount_paid: tx.total_amount, amount_owed: 0 }).eq('id', selectedEntry.id);
       await supabaseClient.from('ledger_entries')
-        .update({ status: 'resolved', amount_paid: tx.total_amount, amount_owed: 0 })
-        .eq('linked_transaction_id', selectedEntry.id);
-
+        .update({ status: 'resolved', amount_paid: tx.total_amount, amount_owed: 0 }).eq('linked_transaction_id', selectedEntry.id);
     } else {
       if (!selectedEntry.ledgerEntryId) throw new Error('No open supplier debt found for this entry.');
-
       const { data: le, error: fetchErr } = await supabaseClient
         .from('ledger_entries').select('amount_owed').eq('id', selectedEntry.ledgerEntryId).single();
       if (fetchErr) throw fetchErr;
-
       await supabaseClient.from('ledger_entries')
-        .update({ status: 'resolved', amount_paid: le.amount_owed, amount_owed: 0 })
-        .eq('id', selectedEntry.ledgerEntryId);
+        .update({ status: 'resolved', amount_paid: le.amount_owed, amount_owed: 0 }).eq('id', selectedEntry.ledgerEntryId);
     }
-
     closeActionSheet();
     loadBookList();
   } catch (err) {
@@ -289,7 +346,6 @@ markPaidBtn.addEventListener('click', async () => {
 deleteEntryBtn.addEventListener('click', async () => {
   if (!selectedEntry) return;
   if (!confirm('Delete this entry? This cannot be undone.')) return;
-
   try {
     if (selectedEntry.kind === 'sale') {
       await supabaseClient.from('ledger_entries').delete().eq('linked_transaction_id', selectedEntry.id);
@@ -308,15 +364,12 @@ deleteEntryBtn.addEventListener('click', async () => {
   }
 });
 
-// ── Helper: adjust an item's real stock count ──────────────
+// ── Helper: adjust real stock count ─────────────────────────
 async function adjustStock(itemId, delta) {
-  const { data: item, error } = await supabaseClient
-    .from('items').select('stock_quantity').eq('id', itemId).single();
+  const { data: item, error } = await supabaseClient.from('items').select('stock_quantity').eq('id', itemId).single();
   if (error) throw error;
-
   const newQty = (Number(item.stock_quantity) || 0) + delta;
-  const { error: updateError } = await supabaseClient
-    .from('items').update({ stock_quantity: newQty }).eq('id', itemId);
+  const { error: updateError } = await supabaseClient.from('items').update({ stock_quantity: newQty }).eq('id', itemId);
   if (updateError) throw updateError;
 }
 
@@ -404,8 +457,6 @@ form.addEventListener('submit', async (e) => {
     await supabaseClient.from('inventory_movements').insert({
       business_id: TEST_BUSINESS_ID, item_id: itemId, type: 'sale', quantity: -qty, reason: 'Sale recorded'
     });
-
-    // Real stock count now actually updates
     await adjustStock(itemId, -qty);
 
     statusMessage.textContent = 'Saved to My Book ✓';
@@ -479,8 +530,46 @@ purchaseForm.addEventListener('submit', async (e) => {
     await supabaseClient.from('inventory_movements').insert({
       business_id: TEST_BUSINESS_ID, item_id: itemId, type: 'restock', quantity: qty, reason: 'Stock purchased'
     });
-
-    // Real stock count now actually updates
     await adjustStock(itemId, qty);
 
-    const linkedToNote 
+    const linkedToNote = isOwed
+      ? `${purchaseItemName.value} — owed to ${supplierName.value}`
+      : purchaseItemName.value;
+
+    const { data: expense, error: expenseError } = await supabaseClient.from('expenses').insert({
+      business_id: TEST_BUSINESS_ID, category: 'Stock Purchase', amount: total, linked_to: linkedToNote
+    }).select('id').single();
+    if (expenseError) throw expenseError;
+
+    if (isOwed) {
+      let { data: existingSupplier } = await supabaseClient
+        .from('suppliers').select('id').eq('business_id', TEST_BUSINESS_ID).eq('name', supplierName.value).maybeSingle();
+      let supplierId = existingSupplier?.id;
+      if (!supplierId) {
+        const { data: newSupplier, error: supplierError } = await supabaseClient
+          .from('suppliers').insert({ business_id: TEST_BUSINESS_ID, name: supplierName.value }).select('id').single();
+        if (supplierError) throw supplierError;
+        supplierId = newSupplier.id;
+      }
+
+      const { error: payableError } = await supabaseClient.from('ledger_entries').insert({
+        business_id: TEST_BUSINESS_ID, supplier_id: supplierId, direction: 'payable',
+        amount_owed: total, amount_paid: 0, status: 'current',
+        attributes: { expense_id: expense.id }
+      });
+      if (payableError) throw payableError;
+    }
+
+    purchaseStatusMessage.textContent = 'Purchase saved ✓';
+    purchaseStatusMessage.className = 'success';
+    purchaseForm.reset(); updatePurchaseTotal(); supplierField.classList.add('hidden');
+    setTimeout(() => { showScreen('bookListScreen'); loadBookList(); }, 900);
+
+  } catch (err) {
+    console.error(err);
+    purchaseStatusMessage.textContent = 'Something went wrong — check the browser console.';
+    purchaseStatusMessage.className = 'error';
+  } finally {
+    purchaseSubmitBtn.disabled = false;
+  }
+});
