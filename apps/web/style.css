@@ -246,3 +246,4 @@ form { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
 .action-sheet-btn.mark-paid { background: var(--positive); color: #fff; }
 .action-sheet-btn.delete { background: var(--surface); color: var(--critical); }
 .action-sheet-btn.cancel { background: none; color: var(--text-dim); }
+                
