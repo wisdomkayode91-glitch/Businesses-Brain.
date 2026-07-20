@@ -60,7 +60,7 @@ body {
 .brand-word span { color: var(--accent); }
 .brand-tagline { font-family: 'Fraunces', serif; font-style: italic; font-size: 11px; color: var(--accent); font-weight: 500; }
 
-.screen { padding: 28px 24px 28px; display: flex; flex-direction: column; flex: 1; min-width: 0; }
+.screen { padding: 28px 24px 28px; display: flex; flex-direction: column; flex: 1; min-width: 0; position: relative; }
 .hidden { display: none !important; }
 .slide-icon { font-size: 34px; margin-bottom: 14px; }
 
@@ -149,7 +149,29 @@ form { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
 .success { color: var(--positive); }
 .error { color: var(--critical); }
 
-/* Tables (shared by My Book and My Stock) */
+/* Daily Briefing */
+.briefing-glow {
+  position: absolute; top: 0; left: 0; right: 0; height: 140px;
+  background: radial-gradient(circle at 50% 0%, rgba(184,134,11,0.12), transparent 70%);
+  pointer-events: none;
+}
+.briefing-body { flex: 1; display: flex; flex-direction: column; gap: 12px; position: relative; z-index: 1; }
+
+.briefing-line {
+  background: var(--surface);
+  border-left: 3px solid var(--accent);
+  border-radius: 10px;
+  padding: 14px 16px;
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.5;
+}
+.briefing-line.positive { border-left-color: var(--positive); }
+.briefing-line.caution { border-left-color: var(--caution); }
+.briefing-line.neutral { border-left-color: var(--border); font-style: italic; color: var(--text-dim); }
+.briefing-line strong { color: var(--accent); font-weight: 700; }
+
+/* Tables (My Book + My Stock) */
 .table-wrap {
   flex: 1;
   overflow-x: auto;
@@ -202,13 +224,8 @@ form { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
 .stock-low { color: var(--critical) !important; }
 
 .status-pill {
-  display: inline-block;
-  font-size: 10.5px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  padding: 3px 9px;
-  border-radius: 20px;
+  display: inline-block; font-size: 10.5px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.03em; padding: 3px 9px; border-radius: 20px;
 }
 .status-pill.paid { background: rgba(63,122,92,0.14); color: var(--positive); }
 .status-pill.owed { background: rgba(181,101,46,0.14); color: var(--caution); }
@@ -229,4 +246,3 @@ form { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
 .action-sheet-btn.mark-paid { background: var(--positive); color: #fff; }
 .action-sheet-btn.delete { background: var(--surface); color: var(--critical); }
 .action-sheet-btn.cancel { background: none; color: var(--text-dim); }
-         
