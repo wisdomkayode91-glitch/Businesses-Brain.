@@ -19,42 +19,41 @@
     <p class="brand-word">LEDGER<span>MIND</span></p>
   </div>
 
-  <!-- CAROUSEL: 6 real slides, auto-advance, press-and-hold pause -->
-  <div class="screen" id="carouselScreen">
+  <!-- LOADING (session check) -->
+  <div class="screen body-content" id="loadingScreen">
+    <p class="helper" style="margin-top:40%;text-align:center;">Loading LedgerMind...</p>
+  </div>
+
+  <!-- CAROUSEL -->
+  <div class="screen hidden" id="carouselScreen">
     <div class="mesh"></div>
     <div class="mesh-content" id="carouselWrap">
+      <!-- Slide 1 -->
       <div class="slide active">
         <div class="slide-icon">📒</div>
-        <h1>Everything you already use to run your business is here.</h1>
-        <p>Sales. Stock. Expenses. Customers. Debts. The notebook you've trusted for years — now it remembers everything and never loses a page.</p>
+        <h1>Everything you need to run your business. In one place.</h1>
+        <p>Sales, purchases, stock, expenses, customers, suppliers, debts, bookings, appointments, rooms, invoices, payments and reports—all together, just like your business.</p>
+        <p>Whether you run a pharmacy, supermarket, hotel, restaurant, boutique, salon, school, mechanic workshop or another business, Business Brain adapts to the way you work—not the other way around.</p>
       </div>
+      <!-- Slide 2 -->
       <div class="slide">
         <div class="slide-icon">💡</div>
-        <h1>But it doesn't just record. It understands.</h1>
-        <div class="example">Rice usually sells out every Thursday. Your supplier is closed tomorrow — reorder today.</div>
-        <div class="example">145 packs of Paracetamol expire next week — move them to the front shelf before newer stock.</div>
+        <h1>It doesn't just record. It understands.</h1>
+        <div class="example">🛒 Rice will likely finish in 3 days. Reorder tomorrow to avoid losing weekend sales.</div>
+        <div class="example">🏨 Room 202 is occupied until Friday. It's already blocked from new bookings to prevent double-booking.</div>
+        <div class="example">💊 15 packs of Paracetamol expire next month. Sell these batches first to reduce losses.</div>
+        <div class="example">🚗 Three repaired vehicles haven't been collected. Send reminders to free up workshop space.</div>
+        <div class="example">💇 Saturdays are always fully booked. Adding another stylist could increase your income.</div>
+        <div class="example">🏫 School fee payments are behind schedule. Send reminders before the deadline.</div>
+        <p>Because Business Brain doesn't just save your records—it understands what they mean.</p>
       </div>
+      <!-- Slide 3 -->
       <div class="slide">
-        <div class="slide-icon">🏨</div>
-        <h1>It thinks ahead for bookings too.</h1>
-        <div class="example">Weekend occupancy is already 92%. Raise Deluxe Room prices before Friday.</div>
-        <div class="example">Room 204 has had three maintenance complaints this month — inspect before the next guest checks in.</div>
-      </div>
-      <div class="slide">
-        <div class="slide-icon">✂️</div>
-        <h1>It remembers your customers too.</h1>
-        <div class="example">Grace hasn't visited in 9 weeks — she usually comes every month.</div>
-        <div class="example">Mr. Bello's oil change is overdue by 600 km.</div>
-      </div>
-      <div class="slide">
-        <div class="slide-icon">🌍</div>
-        <h1>Built for every kind of business.</h1>
-        <p>Shops, pharmacies, restaurants, hotels, salons, mechanics, clinics, schools, farms, factories, offices, and logistics — one brain, every business.</p>
-      </div>
-      <div class="slide">
-        <div class="slide-icon">🔒</div>
-        <h1>Your business belongs to you.</h1>
-        <p>Export every sale, customer, and stock item whenever you want. No lock-in, no hidden fees — your money goes straight to your bank.</p>
+        <div class="slide-icon">🤝</div>
+        <h1>A business partner that never sleeps.</h1>
+        <p>Business Brain learns how your business works, remembers what matters, spots problems early, and gives practical advice before small issues become expensive mistakes.</p>
+        <p>It helps you make smarter decisions, reduce losses, improve profits and stay in control—every single day.</p>
+        <p>Your business keeps running. Business Brain keeps thinking.</p>
       </div>
     </div>
     <div class="dots" id="dots"></div>
@@ -67,6 +66,20 @@
     </div>
   </div>
 
+  <!-- AUTH: sign in or sign up -->
+  <div class="screen hidden body-content" id="authScreen">
+    <p class="eyebrow" id="authEyebrow">Welcome</p>
+    <h1 class="small" id="authHeadline">Sign in to your business</h1>
+    <p class="helper" id="authHelper">Enter your email and password.</p>
+    <form id="authForm">
+      <label>Email<input type="text" id="authEmail" placeholder="e.g. you@email.com" required></label>
+      <label>Password<input type="password" id="authPassword" placeholder="At least 6 characters" required></label>
+      <button type="submit" class="btn-primary gradient" id="authSubmitBtn" style="margin-top:8px;">Sign In</button>
+      <p id="authStatusMessage"></p>
+    </form>
+    <button class="btn-text" id="authToggleBtn" type="button">New here? Create a business account</button>
+  </div>
+
   <!-- NAME -->
   <div class="screen hidden body-content" id="nameScreen">
     <p class="eyebrow">Step 1 of 3</p>
@@ -76,7 +89,7 @@
     <button class="btn-primary gradient" id="nameNextBtn" type="button" disabled style="margin-top:16px;">Continue</button>
   </div>
 
-  <!-- TYPE: 2 per archetype (1-10) + Other = 21 options -->
+  <!-- TYPE -->
   <div class="screen hidden body-content" id="typeScreen">
     <p class="eyebrow">Step 2 of 3</p>
     <h1 class="small">Which of these best describes your business?</h1>
@@ -117,9 +130,10 @@
   <div class="screen hidden body-content" id="photoScreen">
     <p class="eyebrow">Step 3 of 3</p>
     <h1 class="small">Do you already keep records on paper?</h1>
-    <p class="helper">Snap a photo of your stock list or sales book and we'll set it up for you — no typing needed. You'll always see exactly what we read before anything is saved.</p>
+    <p class="helper">Snap a photo of your stock list or sales book and we'll set it up for you — no typing needed.</p>
     <button class="btn-primary gradient" id="uploadPhotoBtn" type="button">📷 Take or Upload a Photo</button>
     <button class="btn-text" id="noPhotoBtn" type="button">I'll start fresh instead</button>
+    <p id="setupStatusMessage" class="helper" style="text-align:center;"></p>
   </div>
 
   <!-- DAILY BRIEFING -->
@@ -129,6 +143,7 @@
     <p class="lead" id="briefLead">Loading your briefing...</p>
     <div class="bento" id="briefingBody"></div>
     <button class="btn-primary gradient" id="openBookBtn" type="button" style="margin-top:14px;">Open My Book →</button>
+    <button class="btn-text" id="logoutBtn" type="button">Log out</button>
   </div>
 
   <!-- MY BOOK -->
@@ -229,5 +244,4 @@
 <script src="supabaseClient.js"></script>
 <script src="app.js"></script>
 </body>
-      </html>
-  
+          </html>
