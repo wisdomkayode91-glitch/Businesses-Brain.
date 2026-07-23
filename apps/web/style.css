@@ -309,7 +309,7 @@ form { display: flex; flex-direction: column; gap: 4px; min-width: 0; flex: 1; }
 .total-preview span:first-child { font-size: 13px; color: var(--text-dim); font-weight: 600; }
 .total-preview span:last-child { font-family: 'Fraunces', serif; font-size: 22px; font-weight: 800; color: var(--accent); font-variant-numeric: tabular-nums; }
 
-#statusMessage, #purchaseStatusMessage { font-size: 13px; text-align: center; min-height: 18px; margin-top: 8px; }
+#statusMessage, #purchaseStatusMessage, #authError { font-size: 13px; text-align: center; min-height: 18px; margin-top: 8px; }
 .success { color: var(--positive); }
 .error { color: var(--critical); }
 
@@ -380,4 +380,4 @@ form { display: flex; flex-direction: column; gap: 4px; min-width: 0; flex: 1; }
 .action-sheet-btn.mark-paid { background: var(--positive); color: #fff; }
 .action-sheet-btn.delete { background: rgba(240,68,56,0.08); color: var(--critical); }
 .action-sheet-btn.cancel { background: none; color: var(--text-dim); }
-  
+    
